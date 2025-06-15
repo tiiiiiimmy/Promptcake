@@ -1,54 +1,76 @@
 import React, { useState } from 'react';
-import { PlusIcon, ClipboardIcon, ArrowTopRightOnSquareIcon, GlobeAltIcon, BookmarkIcon } from '@heroicons/react/24/outline';
 
-interface ReferenceBlock {
-  id: string;
+const logoSvg = (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="32" height="32" rx="16" fill="#EEE" />
+    <text x="16" y="22" textAnchor="middle" fontSize="18" fill="#353535" fontFamily="Kaushan Script, cursive">🍰</text>
+  </svg>
+);
+
+const settingsSvg = (
+  <svg width="24" height="24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 8a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09A1.65 1.65 0 0 0 16 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 8c.14.31.22.65.22 1v.09A1.65 1.65 0 0 0 21 12c0 .35-.08.69-.22 1z" />
+  </svg>
+);
+
+interface MaterialCardProps {
   label: string;
   value: string;
+  onChange: (val: string) => void;
+  onRemove: () => void;
 }
 
-const defaultReferences = [
-  { id: 'job', label: 'Job Description', value: '' },
-  { id: 'resume', label: 'Resume', value: '' },
-];
+const MaterialCard: React.FC<MaterialCardProps> = ({ label, value, onChange, onRemove }) => {
+  const [hover, setHover] = useState(false);
+  return (
+    <div className="popup-reference-card">
+      <div className="popup-reference-header">
+        <span className="popup-reference-label">{label}</span>
+        <button
+          className={hover ? 'popup-btn-remove hovered' : 'popup-btn-remove'}
+          onMouseOver={() => setHover(true)}
+          onMouseOut={() => setHover(false)}
+          onClick={onRemove}
+        >
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 12 13"><path d="M3.625 1.125H3.5C3.56875 1.125 3.625 1.06875 3.625 1V1.125H8.375V1C8.375 1.06875 8.43125 1.125 8.5 1.125H8.375V2.25H9.5V1C9.5 0.448438 9.05156 0 8.5 0H3.5C2.94844 0 2.5 0.448438 2.5 1V2.25H3.625V1.125ZM11.5 2.25H0.5C0.223438 2.25 0 2.47344 0 2.75V3.25C0 3.31875 0.05625 3.375 0.125 3.375H1.06875L1.45469 11.5469C1.47969 12.0797 1.92031 12.5 2.45313 12.5H9.54688C10.0813 12.5 10.5203 12.0813 10.5453 11.5469L10.9313 3.375H11.875C11.9438 3.375 12 3.31875 12 3.25V2.75C12 2.47344 11.7766 2.25 11.5 2.25ZM9.42656 11.375H2.57344L2.19531 3.375H9.80469L9.42656 11.375Z" /></svg>
+        </button>
+      </div>
+      <textarea
+        className="popup-reference-textarea"
+        placeholder={label === 'Materials 1' ? 'Job Description...' : label === 'Materials 2' ? 'Resume...' : 'Content...'}
+        value={value}
+        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => onChange(e.target.value)}
+      />
+    </div>
+  );
+};
 
 const Popup: React.FC = () => {
   const [instruction, setInstruction] = useState('');
-  const [references, setReferences] = useState<ReferenceBlock[]>(defaultReferences);
-  const [translated, setTranslated] = useState('');
+  const [references, setReferences] = useState([
+    { id: '1', label: 'Materials 1', value: '' },
+    { id: '2', label: 'Materials 2', value: '' },
+  ]);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saved'>('idle');
+  const [addHover, setAddHover] = useState(false);
 
-  // 添加参考材料块
+  // 添加材料
   const handleAddReference = () => {
-    const nextIndex = references.length + 1;
     setReferences([
       ...references,
-      { id: Date.now().toString(), label: `Reference ${nextIndex}`, value: '' }
+      { id: Date.now().toString(), label: `Materials ${references.length + 1}`, value: '' }
     ]);
   };
 
-  // 编辑参考材料内容
+  // 编辑内容
   const handleRefChange = (id: string, value: string) => {
     setReferences(refs => refs.map(r => r.id === id ? { ...r, value } : r));
   };
 
-  // 删除参考材料
+  // 删除材料
   const handleRemoveReference = (id: string) => {
     setReferences(refs => refs.filter(r => r.id !== id));
-  };
-
-  // 翻译主指令（模拟）
-  const handleTranslate = () => {
-    setTranslated('This is a translated version of: ' + instruction);
-  };
-
-  // 保存主指令（模拟）
-  const handleSaveInstruction = () => {
-    alert('Instruction saved!');
-  };
-
-  // 保存完整 prompt（模拟）
-  const handleSavePrompt = () => {
-    alert('Prompt (instruction + references) saved!');
   };
 
   // 复制全部
@@ -58,89 +80,80 @@ const Popup: React.FC = () => {
     alert('Copied to clipboard!');
   };
 
-  // 跳转 ChatGPT
-  const handleOpenChatGPT = () => {
-    window.open('https://chat.openai.com/', '_blank');
+  // 保存指令
+  const handleSaveInstruction = () => {
+    setSaveStatus('saved');
+    setTimeout(() => setSaveStatus('idle'), 2000);
+  };
+
+  // 翻译（模拟）
+  const handleTranslate = () => {
+    alert('Translate to EN!');
   };
 
   return (
     <div className="popup-root">
-      {/* 顶部 Logo + 名称 */}
+      {/* 顶部 Logo + 名称 + 设置icon */}
       <div className="popup-header">
-        <span className="popup-logo">🍰</span>
-        <span className="popup-title">PromptCake</span>
+        <div className="popup-header-left">
+          <span className="popup-logo">{logoSvg}</span>
+          <span className="popup-title">Promptcake</span>
+        </div>
+        <button className="popup-settings-btn" title="Settings">
+          {settingsSvg}
+        </button>
       </div>
-      <hr />
-      {/* 主指令区 */}
+
+      {/* Instruction 区块 */}
       <div className="popup-section">
         <div className="popup-section-header">
-          <label className="popup-label">Instruction</label>
-          <button className="popup-btn-save-instruction" onClick={handleSaveInstruction}>
-            <BookmarkIcon className="icon" /> Save Instruction
+          <span className="popup-label">Instruction</span>
+          <button className="popup-btn-save" onClick={handleSaveInstruction}>
+            {saveStatus === 'saved' ? 'Saved!' : 'Save'}
+            <svg width="16" height="16" fill="#418fb7" style={{ marginLeft: 4, opacity: saveStatus === 'saved' ? 0.3 : 1 }} viewBox="0 0 12 12"><path d="M11.7195 2.7195L9.2805 0.2805C9.168 0.168 9.03 0.0855 8.88 0.0405V0H0.48C0.2145 0 0 0.2145 0 0.48V11.52C0 11.7855 0.2145 12 0.48 12H11.52C11.7855 12 12 11.7855 12 11.52V3.3975C12 3.1425 11.8995 2.8995 11.7195 2.7195ZM4.08 1.08H7.92V2.64H4.08V1.08ZM10.92 10.92H1.08V1.08H3.12V3.12C3.12 3.3855 3.3345 3.6 3.6 3.6H8.4C8.6655 3.6 8.88 3.3855 8.88 3.12V1.407L10.92 3.447V10.92ZM6 4.95C4.8075 4.95 3.84 5.9175 3.84 7.11C3.84 8.3025 4.8075 9.27 6 9.27C7.1925 9.27 8.16 8.3025 8.16 7.11C8.16 5.9175 7.1925 4.95 6 4.95ZM6 8.31C5.337 8.31 4.8 7.773 4.8 7.11C4.8 6.447 5.337 5.91 6 5.91C6.663 5.91 7.2 6.447 7.2 7.11C7.2 7.773 6.663 8.31 6 8.31Z" /></svg>
           </button>
         </div>
         <textarea
           className="popup-textarea"
-          rows={2}
-          placeholder="Write a cover letter..."
+          placeholder="Write a cover letter for me..."
           value={instruction}
-          onChange={e => setInstruction(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInstruction(e.target.value)}
         />
       </div>
-      <hr />
-      {/* 参考材料区 */}
+
+      {/* Reference Materials 区块 */}
       <div className="popup-section">
         <div className="popup-section-header">
-          <span className="popup-section-icon">📎</span>
-          <span className="popup-label">Reference Materials</span>
+          <span className="popup-label">Materials</span>
         </div>
         <div className="popup-reference-list">
-          {references.map((ref) => (
-            <div key={ref.id} className="popup-reference">
-              <span className="popup-label" style={{width: '8rem'}}>{ref.label}</span>
-              <textarea
-                className="popup-input popup-input-value"
-                rows={2}
-                placeholder={`Enter reference...`}
-                value={ref.value}
-                onChange={e => handleRefChange(ref.id, e.target.value)}
-              />
-              <button className="popup-btn-remove" onClick={() => handleRemoveReference(ref.id)} title="Remove">
-                ×
-              </button>
-            </div>
+          {references.map((ref, idx) => (
+            <MaterialCard
+              key={ref.id}
+              label={ref.label}
+              value={ref.value}
+              onChange={(val: string) => handleRefChange(ref.id, val)}
+              onRemove={() => handleRemoveReference(ref.id)}
+            />
           ))}
-          <div className="popup-reference-add">
-            <button className="popup-btn-add" onClick={handleAddReference}>
-              <PlusIcon className="icon" /> Add Reference Block
-            </button>
-          </div>
+          <button
+            className={addHover ? 'popup-btn-add-material hovered' : 'popup-btn-add-material'}
+            onMouseOver={() => setAddHover(true)}
+            onMouseOut={() => setAddHover(false)}
+            onClick={handleAddReference}
+          >
+            Add Materials +
+          </button>
         </div>
       </div>
-      <hr />
-      {/* 操作区：翻译、保存 */}
+
+      {/* 底部操作区 */}
       <div className="popup-actions-row">
-        <button className="popup-btn popup-btn-translate" onClick={handleTranslate}>
-          <GlobeAltIcon className="icon" /> Translate
+        <button className="popup-btn-translate" onClick={handleTranslate}>
+          Translate to EN
         </button>
-        <button className="popup-btn popup-btn-save-prompt" onClick={handleSavePrompt}>
-          <BookmarkIcon className="icon" /> Save Prompt
-        </button>
-      </div>
-      {/* 翻译结果展示 */}
-      {translated && (
-        <div className="popup-translation-result">
-          <span className="popup-translation-label">EN:</span> {translated}
-        </div>
-      )}
-      <hr />
-      {/* 底部操作区：复制/跳转 */}
-      <div className="popup-actions-row">
-        <button className="popup-btn popup-btn-copy" onClick={handleCopyAll}>
-          <ClipboardIcon className="icon" /> Copy All
-        </button>
-        <button className="popup-btn popup-btn-open-chatgpt" onClick={handleOpenChatGPT}>
-          <ArrowTopRightOnSquareIcon className="icon" /> Open ChatGPT
+        <button className="popup-btn-copyall" onClick={handleCopyAll}>
+          Copy all
         </button>
       </div>
     </div>
