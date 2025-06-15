@@ -196,7 +196,7 @@ const Popup: React.FC = () => {
         {/* 已保存指令列表 */}
         {showSavedInstructions && (
           <div className="popup-saved-instructions-list">
-            {savedInstructions.map((savedInstruction, index) => (
+            {savedInstructions.map((savedInstruction) => (
               <div key={savedInstruction.id} className="popup-saved-instruction-item">
                 <div 
                   className="popup-saved-instruction-content"
@@ -236,7 +236,7 @@ const Popup: React.FC = () => {
           <span className="popup-label">Materials</span>
         </div>
         <div className="popup-reference-list">
-          {references.map((ref, idx) => (
+          {references.map((ref) => (
             <MaterialCard
               key={ref.id}
               label={ref.label}
