@@ -40,29 +40,29 @@ export const TranslationPanel: React.FC = () => {
   }
 
   return (
-    <div className="border-t border-gray-200 pt-4">
+    <div className="translation-panel">
       <button
-        className="w-full flex items-center justify-between text-gray-700 hover:text-gray-900"
+        className="translation-toggle"
         onClick={() => dispatch(toggleTranslationPanel())}
       >
-        <span className="font-medium">Translation</span>
+        <span className="translation-title">Translation</span>
         {isOpen ? (
-          <ChevronUpIcon className="w-5 h-5" />
+          <ChevronUpIcon className="icon" />
         ) : (
-          <ChevronDownIcon className="w-5 h-5" />
+          <ChevronDownIcon className="icon" />
         )}
       </button>
 
       {isOpen && (
-        <div className="mt-4 space-y-4">
+        <div className="translation-section">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="translation-label">
               Target Language
             </label>
             <select
               value={targetLanguage}
               onChange={(e) => setTargetLanguage(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="translation-select"
             >
               {SUPPORTED_LANGUAGES.map((lang) => (
                 <option key={lang.code} value={lang.code}>
@@ -73,18 +73,18 @@ export const TranslationPanel: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="translation-label">
               Translated Text
             </label>
-            <div className="mt-1 p-3 bg-gray-50 rounded-md min-h-[100px]">
+            <div className="translation-result">
               {translatedText || 'Translation will appear here...'}
             </div>
           </div>
 
-          <div className="flex justify-end">
+          <div className="translation-actions">
             <button
               onClick={handleTranslate}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              className="btn-primary"
             >
               Translate
             </button>

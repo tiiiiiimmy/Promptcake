@@ -57,61 +57,61 @@ export const PromptEditor: React.FC = () => {
 
   if (!selectedPrompt) {
     return (
-      <div className="h-full flex items-center justify-center text-gray-500">
+      <div className="empty-message">
         Select a prompt to edit
       </div>
     );
   }
 
   return (
-    <div className="h-full flex flex-col space-y-4">
+    <div className="prompt-editor">
       <div>
-        <label className="block text-sm font-medium text-gray-700">Title</label>
+        <label className="label">Title</label>
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        />
-      </div>
-
-      <div className="flex-1">
-        <label className="block text-sm font-medium text-gray-700">Instructions</label>
-        <textarea
-          value={instructions}
-          onChange={(e) => setInstructions(e.target.value)}
-          className="mt-1 block w-full h-32 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          className="input-primary"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Tags</label>
-        <div className="mt-1 flex gap-2">
+        <label className="label">Instructions</label>
+        <textarea
+          value={instructions}
+          onChange={(e) => setInstructions(e.target.value)}
+          className="input-primary"
+        />
+      </div>
+
+      <div>
+        <label className="label">Tags</label>
+        <div className="tag-input-row">
           <input
             type="text"
             value={newTag}
             onChange={(e) => setNewTag(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="input-primary"
             placeholder="Add a tag..."
           />
           <button
             onClick={handleAddTag}
-            className="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            className="btn-primary"
           >
             Add
           </button>
         </div>
-        <div className="mt-2 flex flex-wrap gap-2">
+        <div className="tag-list">
           {tags.map((tag) => (
             <span
               key={tag}
-              className="inline-flex items-center px-2 py-1 rounded-full text-sm bg-gray-100 text-gray-800"
+              className="tag"
             >
               {tag}
               <button
                 onClick={() => handleRemoveTag(tag)}
-                className="ml-1 text-gray-500 hover:text-gray-700"
+                className="tag-remove"
               >
                 ×
               </button>
@@ -120,10 +120,10 @@ export const PromptEditor: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="actions">
         <button
           onClick={handleSave}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          className="btn-primary"
         >
           Save Changes
         </button>

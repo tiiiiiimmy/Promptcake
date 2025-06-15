@@ -15,34 +15,32 @@ const Options: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">PromptCake Settings</h1>
+    <div className="options-root">
+      <div className="options-container">
+        <h1 className="options-title">PromptCake Settings</h1>
 
-        <div className="bg-white rounded-lg shadow p-6 space-y-6">
+        <div className="options-section">
           <div>
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Appearance</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Theme</label>
-                <select
-                  value={theme}
-                  onChange={(e) => handleThemeChange(e.target.value as 'light' | 'dark')}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                >
-                  <option value="light">Light</option>
-                  <option value="dark">Dark</option>
-                </select>
-              </div>
+            <h2 className="options-section-title">Appearance</h2>
+            <div>
+              <label className="options-label">Theme</label>
+              <select
+                value={theme}
+                onChange={(e) => handleThemeChange(e.target.value as 'light' | 'dark')}
+                className="options-select"
+              >
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+              </select>
             </div>
           </div>
 
           <div>
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Data Management</h2>
-            <div className="space-y-4">
+            <h2 className="options-section-title">Data Management</h2>
+            <div>
               <button
                 onClick={() => storageService.clearAll()}
-                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+                className="options-btn options-btn-danger"
               >
                 Clear All Data
               </button>
@@ -50,8 +48,8 @@ const Options: React.FC = () => {
           </div>
 
           <div>
-            <h2 className="text-lg font-medium text-gray-900 mb-4">About</h2>
-            <p className="text-sm text-gray-500">
+            <h2 className="options-section-title">About</h2>
+            <p className="options-about">
               PromptCake v1.0.0 - A Chrome extension for organizing and managing ChatGPT prompts
             </p>
           </div>

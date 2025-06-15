@@ -15,25 +15,20 @@ const defaultReferences = [
 const Popup: React.FC = () => {
   const [instruction, setInstruction] = useState('');
   const [references, setReferences] = useState<ReferenceBlock[]>(defaultReferences);
-  const [newRefLabel, setNewRefLabel] = useState('');
   const [translated, setTranslated] = useState('');
 
   // 添加参考材料块
   const handleAddReference = () => {
-    if (newRefLabel.trim()) {
-      setReferences([...references, { id: Date.now().toString(), label: newRefLabel, value: '' }]);
-      setNewRefLabel('');
-    }
+    const nextIndex = references.length + 1;
+    setReferences([
+      ...references,
+      { id: Date.now().toString(), label: `Reference ${nextIndex}`, value: '' }
+    ]);
   };
 
   // 编辑参考材料内容
   const handleRefChange = (id: string, value: string) => {
     setReferences(refs => refs.map(r => r.id === id ? { ...r, value } : r));
-  };
-
-  // 编辑参考材料标题
-  const handleRefLabelChange = (id: string, label: string) => {
-    setReferences(refs => refs.map(r => r.id === id ? { ...r, label } : r));
   };
 
   // 删除参考材料
@@ -69,23 +64,23 @@ const Popup: React.FC = () => {
   };
 
   return (
-    <div className="w-[400px] min-h-[600px] bg-white p-4 flex flex-col gap-4 font-sans">
+    <div className="popup-root">
       {/* 顶部 Logo + 名称 */}
-      <div className="flex items-center gap-2 mb-2">
-        <span className="inline-block w-8 h-8 bg-sky-400 rounded-full flex items-center justify-center text-white text-xl font-bold">🍰</span>
-        <span className="text-2xl font-bold text-gray-800 tracking-tight">PromptCake</span>
+      <div className="popup-header">
+        <span className="popup-logo">🍰</span>
+        <span className="popup-title">PromptCake</span>
       </div>
       <hr />
       {/* 主指令区 */}
-      <div>
-        <div className="flex items-center justify-between mb-1">
-          <label className="font-semibold text-gray-700">Instruction</label>
-          <button className="flex items-center gap-1 text-xs text-blue-600 hover:underline" onClick={handleSaveInstruction}>
-            <BookmarkIcon className="w-4 h-4" /> Save Instruction
+      <div className="popup-section">
+        <div className="popup-section-header">
+          <label className="popup-label">Instruction</label>
+          <button className="popup-btn-save-instruction" onClick={handleSaveInstruction}>
+            <BookmarkIcon className="icon" /> Save Instruction
           </button>
         </div>
         <textarea
-          className="w-full rounded border border-gray-300 p-2 focus:ring-2 focus:ring-sky-400 focus:outline-none resize-none"
+          className="popup-textarea"
           rows={2}
           placeholder="Write a cover letter..."
           value={instruction}
@@ -94,69 +89,58 @@ const Popup: React.FC = () => {
       </div>
       <hr />
       {/* 参考材料区 */}
-      <div>
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-base">📎</span>
-          <span className="font-semibold text-gray-700">Reference Materials</span>
+      <div className="popup-section">
+        <div className="popup-section-header">
+          <span className="popup-section-icon">📎</span>
+          <span className="popup-label">Reference Materials</span>
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="popup-reference-list">
           {references.map((ref) => (
-            <div key={ref.id} className="flex gap-2 items-start">
-              <input
-                className="w-32 rounded border border-gray-200 px-2 py-1 text-xs"
-                value={ref.label}
-                onChange={e => handleRefLabelChange(ref.id, e.target.value)}
-              />
+            <div key={ref.id} className="popup-reference">
+              <span className="popup-label" style={{width: '8rem'}}>{ref.label}</span>
               <textarea
-                className="flex-1 rounded border border-gray-200 px-2 py-1 text-xs"
+                className="popup-input popup-input-value"
                 rows={2}
-                placeholder={`Enter ${ref.label}...`}
+                placeholder={`Enter reference...`}
                 value={ref.value}
                 onChange={e => handleRefChange(ref.id, e.target.value)}
               />
-              <button className="text-gray-400 hover:text-red-500" onClick={() => handleRemoveReference(ref.id)} title="Remove">
+              <button className="popup-btn-remove" onClick={() => handleRemoveReference(ref.id)} title="Remove">
                 ×
               </button>
             </div>
           ))}
-          <div className="flex gap-2 items-center mt-1">
-            <input
-              className="w-32 rounded border border-gray-200 px-2 py-1 text-xs"
-              placeholder="New block label"
-              value={newRefLabel}
-              onChange={e => setNewRefLabel(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleAddReference()}
-            />
-            <button className="flex items-center gap-1 px-2 py-1 text-xs bg-gray-100 rounded hover:bg-gray-200 border border-gray-200" onClick={handleAddReference}>
-              <PlusIcon className="w-4 h-4" /> Add Reference Block
+          <div className="popup-reference-add">
+            <button className="popup-btn-add" onClick={handleAddReference}>
+              <PlusIcon className="icon" /> Add Reference Block
             </button>
           </div>
         </div>
       </div>
       <hr />
       {/* 操作区：翻译、保存 */}
-      <div className="flex gap-2">
-        <button className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-sky-500 text-white rounded hover:bg-sky-600" onClick={handleTranslate}>
-          <GlobeAltIcon className="w-5 h-5" /> Translate
+      <div className="popup-actions-row">
+        <button className="popup-btn popup-btn-translate" onClick={handleTranslate}>
+          <GlobeAltIcon className="icon" /> Translate
         </button>
-        <button className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600" onClick={handleSavePrompt}>
-          <BookmarkIcon className="w-5 h-5" /> Save Prompt
+        <button className="popup-btn popup-btn-save-prompt" onClick={handleSavePrompt}>
+          <BookmarkIcon className="icon" /> Save Prompt
         </button>
       </div>
       {/* 翻译结果展示 */}
       {translated && (
-        <div className="bg-gray-50 border border-sky-100 rounded p-2 text-xs text-gray-700">
-          <span className="font-semibold">EN:</span> {translated}
+        <div className="popup-translation-result">
+          <span className="popup-translation-label">EN:</span> {translated}
         </div>
       )}
       <hr />
       {/* 底部操作区：复制/跳转 */}
-      <div className="flex gap-2">
-        <button className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 border border-gray-200" onClick={handleCopyAll}>
-          <ClipboardIcon className="w-5 h-5" /> Copy All
+      <div className="popup-actions-row">
+        <button className="popup-btn popup-btn-copy" onClick={handleCopyAll}>
+          <ClipboardIcon className="icon" /> Copy All
         </button>
-        <button className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-purple-500 text-white rounded hover:bg-purple-600" onClick={handleOpenChatGPT}>
-          <ArrowTopRightOnSquareIcon className="w-5 h-5" /> Open ChatGPT
+        <button className="popup-btn popup-btn-open-chatgpt" onClick={handleOpenChatGPT}>
+          <ArrowTopRightOnSquareIcon className="icon" /> Open ChatGPT
         </button>
       </div>
     </div>

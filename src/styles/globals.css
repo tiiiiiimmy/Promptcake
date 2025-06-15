@@ -1,46 +1,92 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+// This file has been renamed to globals.scss as part of the migration to Sass.
 
-@layer base {
-  body {
-    @apply bg-white text-gray-900;
+body {
+  background: #fff;
+  color: #1a202c;
+  width: 400px;
+  height: 600px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: system-ui, sans-serif;
+}
+
+.btn-primary {
+  padding: 0.5rem 1rem;
+  background: #3b82f6;
+  color: #fff;
+  border-radius: 0.375rem;
+  transition: background 0.2s;
+  border: none;
+  cursor: pointer;
+  &:hover {
+    background: #2563eb;
   }
 }
 
-@layer components {
-  .btn-primary {
-    @apply px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors;
-  }
-
-  .btn-secondary {
-    @apply px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors;
-  }
-
-  .input-primary {
-    @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500;
+.btn-secondary {
+  padding: 0.5rem 1rem;
+  background: #f3f4f6;
+  color: #374151;
+  border-radius: 0.375rem;
+  transition: background 0.2s;
+  border: none;
+  cursor: pointer;
+  &:hover {
+    background: #e5e7eb;
   }
 }
 
-/* Custom scrollbar styles */
+.input-primary {
+  display: block;
+  width: 100%;
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+  padding: 0.5rem;
+  font-size: 1rem;
+  &:focus {
+    border-color: #3b82f6;
+    outline: none;
+    box-shadow: 0 0 0 2px #3b82f633;
+  }
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100;
+  background: #f3f4f6;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 rounded-full hover:bg-gray-400;
+  background: #d1d5db;
+  border-radius: 9999px;
+  &:hover {
+    background: #9ca3af;
+  }
 }
 
-/* Chrome extension specific styles */
-body {
-  width: 400px;
-  height: 600px;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  background: #f3f4f6;
+  color: #1f2937;
+  margin-right: 0.5rem;
+}
+
+.tag-remove {
+  margin-left: 0.25rem;
+  color: #6b7280;
+  background: none;
+  border: none;
+  cursor: pointer;
+  &:hover {
+    color: #374151;
+  }
 } 

@@ -3,60 +3,59 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import fs from 'fs';
 
-// Copy manifest.json and other static files to dist
+// ✅ 拷贝静态资源（manifest.json、icons、HTML）
 function copyStaticFiles() {
   return {
     name: 'copy-static-files',
     closeBundle() {
       // Copy manifest.json
       fs.copyFileSync('manifest.json', 'dist/manifest.json');
-      
-      // Copy background.js if exists
+
+      // Move compiled background.js if needed
       if (fs.existsSync('src/background/index.ts')) {
         if (fs.existsSync('dist/assets/background.js')) {
           fs.copyFileSync('dist/assets/background.js', 'dist/background.js');
         }
       }
 
-      // Create icons directory if it doesn't exist
-      if (!fs.existsSync('dist/icons')) {
-        fs.mkdirSync('dist/icons', { recursive: true });
+      // Copy icons
+      const iconSrcDir = 'public/icons';
+      const iconDistDir = 'dist/icons';
+      if (!fs.existsSync(iconDistDir)) {
+        fs.mkdirSync(iconDistDir, { recursive: true });
       }
-
-      // Copy icons if they exist
-      if (fs.existsSync('public/icons')) {
-        fs.readdirSync('public/icons').forEach(file => {
-          if (file.endsWith('.png')) {
-            fs.copyFileSync(
-              path.join('public/icons', file),
-              path.join('dist/icons', file)
-            );
+      if (fs.existsSync(iconSrcDir)) {
+        fs.readdirSync(iconSrcDir).forEach(file => {
+          if (file.endsWith('.png') || file.endsWith('.svg')) {
+            fs.copyFileSync(path.join(iconSrcDir, file), path.join(iconDistDir, file));
           }
         });
       }
 
-      // Move HTML files to dist root
-      if (fs.existsSync('dist/src/pages/popup/index.html')) {
-        fs.copyFileSync('dist/src/pages/popup/index.html', 'dist/popup.html');
-      }
-      if (fs.existsSync('dist/src/pages/options/index.html')) {
-        fs.copyFileSync('dist/src/pages/options/index.html', 'dist/options.html');
-      }
-    }
+      // Copy popup.html & options.html
+      const pages = ['popup', 'options'];
+      pages.forEach(page => {
+        const inputPath = `dist/src/pages/${page}/index.html`;
+        const outputPath = `dist/${page}.html`;
+        if (fs.existsSync(inputPath)) {
+          fs.copyFileSync(inputPath, outputPath);
+        }
+      });
+    },
   };
 }
 
-// 动态生成 input 配置，避免 undefined
+// ✅ 动态 rollup input 配置
 function getRollupInput() {
-  const input = {
+  const input: Record<string, string> = {
     popup: 'src/pages/popup/index.html',
     options: 'src/pages/options/index.html',
-    content: 'src/content/index.ts',
-    'content.css': 'src/content/styles.css',
   };
+
   if (fs.existsSync('src/background/index.ts')) {
     input['background'] = 'src/background/index.ts';
   }
+
   return input;
 }
 
@@ -70,6 +69,7 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
+    emptyOutDir: true,
     rollupOptions: {
       input: getRollupInput(),
       output: {
@@ -79,4 +79,4 @@ export default defineConfig({
       },
     },
   },
-}); 
+});

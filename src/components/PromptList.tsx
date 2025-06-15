@@ -13,43 +13,39 @@ export const PromptList: React.FC = () => {
   };
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-gray-700">Your Prompts</h2>
+    <div className="prompt-list">
+      <div className="prompt-list-header">
+        <h2>Your Prompts</h2>
         <button
-          className="p-2 rounded-full hover:bg-gray-100"
+          className="add-prompt-btn"
           onClick={() => {/* TODO: Implement new prompt creation */}}
         >
-          <PlusIcon className="w-5 h-5 text-gray-600" />
+          <PlusIcon className="icon" />
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="prompt-list-content">
         {prompts.length === 0 ? (
-          <div className="text-center text-gray-500 py-4">
+          <div className="empty-message">
             No prompts yet. Create your first prompt!
           </div>
         ) : (
-          <ul className="space-y-2">
+          <ul className="prompt-list-ul">
             {prompts.map((prompt) => (
               <li
                 key={prompt.id}
-                className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                  selectedPromptId === prompt.id
-                    ? 'bg-blue-50 border border-blue-200'
-                    : 'hover:bg-gray-50 border border-gray-200'
-                }`}
+                className={`prompt-list-item${selectedPromptId === prompt.id ? ' selected' : ''}`}
                 onClick={() => handlePromptSelect(prompt.id)}
               >
-                <h3 className="font-medium text-gray-800">{prompt.title}</h3>
-                <p className="text-sm text-gray-500 truncate">
+                <h3 className="prompt-title">{prompt.title}</h3>
+                <p className="prompt-instructions">
                   {prompt.instructions}
                 </p>
-                <div className="flex gap-2 mt-2">
+                <div className="prompt-tags">
                   {prompt.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full"
+                      className="tag"
                     >
                       {tag}
                     </span>

@@ -1,0 +1,492 @@
+// Converted from Tailwind to SCSS
+
+body {
+  background: #fff;
+  color: #1a202c;
+  width: 400px;
+  height: 600px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: system-ui, sans-serif;
+}
+
+.btn-primary {
+  padding: 0.5rem 1rem;
+  background: #3b82f6;
+  color: #fff;
+  border-radius: 0.375rem;
+  transition: background 0.2s;
+  border: none;
+  cursor: pointer;
+  &:hover {
+    background: #2563eb;
+  }
+}
+
+.btn-secondary {
+  padding: 0.5rem 1rem;
+  background: #f3f4f6;
+  color: #374151;
+  border-radius: 0.375rem;
+  transition: background 0.2s;
+  border: none;
+  cursor: pointer;
+  &:hover {
+    background: #e5e7eb;
+  }
+}
+
+.input-primary {
+  display: block;
+  width: 100%;
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+  padding: 0.5rem;
+  font-size: 1rem;
+  &:focus {
+    border-color: #3b82f6;
+    outline: none;
+    box-shadow: 0 0 0 2px #3b82f633;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f3f4f6;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 9999px;
+  &:hover {
+    background: #9ca3af;
+  }
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  background: #f3f4f6;
+  color: #1f2937;
+  margin-right: 0.5rem;
+}
+
+.tag-remove {
+  margin-left: 0.25rem;
+  color: #6b7280;
+  background: none;
+  border: none;
+  cursor: pointer;
+  &:hover {
+    color: #374151;
+  }
+}
+
+// PromptList styles
+.prompt-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.prompt-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.prompt-list-header h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+}
+.add-prompt-btn {
+  padding: 0.5rem;
+  border-radius: 9999px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover {
+    background: #f3f4f6;
+  }
+}
+.icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #4b5563;
+}
+.prompt-list-content {
+  flex: 1;
+  overflow-y: auto;
+}
+.empty-message {
+  text-align: center;
+  color: #6b7280;
+  padding: 1rem 0;
+}
+.prompt-list-ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.prompt-list-item {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: background 0.2s, border 0.2s;
+  background: #fff;
+  &:hover {
+    background: #f9fafb;
+  }
+  &.selected {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+  }
+}
+.prompt-title {
+  font-weight: 500;
+  color: #1f2937;
+}
+.prompt-instructions {
+  font-size: 0.95rem;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.prompt-tags {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+// TranslationPanel styles
+.translation-panel {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+}
+.translation-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #374151;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s;
+  &:hover {
+    color: #111827;
+  }
+}
+.translation-title {
+  font-weight: 500;
+}
+.translation-section {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.translation-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+.translation-select {
+  width: 100%;
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+.translation-result {
+  margin-top: 0.25rem;
+  padding: 0.75rem;
+  background: #f9fafb;
+  border-radius: 0.375rem;
+  min-height: 100px;
+  color: #374151;
+  font-size: 0.95rem;
+}
+.translation-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+// Options page styles
+.options-root {
+  min-height: 100vh;
+  background: #f9fafb;
+  padding: 2rem;
+}
+.options-container {
+  max-width: 640px;
+  margin: 0 auto;
+}
+.options-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #111827;
+  margin-bottom: 2rem;
+}
+.options-section {
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.04);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.options-section-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+.options-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+.options-select {
+  width: 100%;
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+.options-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  background: #3b82f6;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover {
+    background: #2563eb;
+  }
+}
+.options-btn-danger {
+  background: #ef4444;
+  &:hover {
+    background: #dc2626;
+  }
+}
+.options-about {
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+// Popup styles
+.popup-root {
+  width: 400px;
+  min-height: 600px;
+  background: #fff;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  font-family: system-ui, sans-serif;
+}
+.popup-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.popup-logo {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  background: #38bdf8;
+  border-radius: 9999px;
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.popup-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1f2937;
+  letter-spacing: -0.01em;
+}
+.popup-section {
+  margin-bottom: 0.5rem;
+}
+.popup-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+.popup-section-icon {
+  font-size: 1.1rem;
+  margin-right: 0.25rem;
+}
+.popup-label {
+  font-weight: 600;
+  color: #374151;
+}
+.popup-btn-save-instruction {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: #2563eb;
+  background: none;
+  border: none;
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+.popup-textarea {
+  width: 100%;
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+  padding: 0.5rem;
+  font-size: 1rem;
+  resize: none;
+  &:focus {
+    outline: none;
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 2px #38bdf833;
+  }
+}
+.popup-reference-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.popup-reference {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+.popup-input {
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.85rem;
+}
+.popup-input-label {
+  width: 8rem;
+}
+.popup-input-value {
+  flex: 1;
+}
+.popup-btn-remove {
+  color: #9ca3af;
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  &:hover {
+    color: #ef4444;
+  }
+}
+.popup-reference-add {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.25rem;
+}
+.popup-btn-add {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  &:hover {
+    background: #e5e7eb;
+  }
+}
+.popup-actions-row {
+  display: flex;
+  gap: 0.5rem;
+}
+.popup-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.popup-btn-translate {
+  background: #0ea5e9;
+  color: #fff;
+  &:hover {
+    background: #0369a1;
+  }
+}
+.popup-btn-save-prompt {
+  background: #22c55e;
+  color: #fff;
+  &:hover {
+    background: #15803d;
+  }
+}
+.popup-translation-result {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  font-size: 0.85rem;
+  color: #334155;
+}
+.popup-translation-label {
+  font-weight: 600;
+  margin-right: 0.25rem;
+}
+.popup-btn-copy {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  &:hover {
+    background: #e5e7eb;
+  }
+}
+.popup-btn-open-chatgpt {
+  background: #a78bfa;
+  color: #fff;
+  &:hover {
+    background: #7c3aed;
+  }
+} 

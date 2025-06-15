@@ -1,1 +1,0 @@
-console.log('PromptCake content script loaded'); 
