@@ -3,11 +3,12 @@
 body {
   background: #fff;
   color: #1a202c;
-  width: 400px;
-  height: 600px;
+  width: 420px;
+  min-height: 500px;
+  max-height: 600px;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow-y: auto;
   font-family: system-ui, sans-serif;
 }
 
@@ -306,10 +307,8 @@ body {
   min-width: 360px;
   max-width: 420px;
   background: #fff;
-  border-radius: 20px;
   padding: 20px;
   font-family: "Inter", sans-serif;
-  box-shadow: 0 2px 16px #e5e7eb;
 }
 
 .popup-header {
@@ -325,10 +324,6 @@ body {
   gap: 12px;
 }
 .popup-logo {
-  width: 40px;
-  height: 40px;
-  background: #eee;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -337,7 +332,6 @@ body {
   font-family: "Kaushan Script", cursive;
   font-size: 32px;
   color: #353535;
-  margin-left: 8px;
   letter-spacing: 1px;
 }
 .popup-settings-btn {
@@ -398,7 +392,7 @@ body {
   align-items: flex-start;
   gap: 0.8125rem;
   align-self: stretch;
-  
+
   border-radius: 16px;
   border: none;
   background: linear-gradient(
@@ -485,7 +479,7 @@ body {
 .popup-btn-add-material {
   border-radius: 14px;
   border: none;
-  background: #DBEAF2;
+  background: #dbeaf2;
   color: #418fb7;
   font-weight: 700;
   font-size: 12px;
@@ -545,7 +539,7 @@ body {
   width: 100%;
   border-radius: 14px;
   border: none;
-  background: #DBEAF2;
+  background: #dbeaf2;
   color: #418fb7;
   font-weight: 700;
   font-size: 12px;
@@ -567,7 +561,7 @@ body {
   overflow-y: auto;
   margin-bottom: 8px;
   border-radius: 12px;
-  background: #DBEAF2;
+  background: #dbeaf2;
 }
 
 .popup-saved-instruction-item {
@@ -604,6 +598,37 @@ body {
   font-size: 10px;
   color: #9ca3af;
   font-family: "Inter", sans-serif;
+}
+
+// 翻译结果样式
+.popup-translation-result {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.popup-translation-label {
+  font-weight: 600;
+  color: #0369a1;
+  margin-bottom: 4px;
+  font-family: "Inter", sans-serif;
+}
+
+.popup-translation-text {
+  color: #1e40af;
+  line-height: 1.4;
+  font-family: "Inter", sans-serif;
+}
+
+.popup-btn-translate:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  &:hover {
+    background: #e6f4ea;
+  }
 }
 
 @media (max-width: 420px) {

@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { TRANSLATE_CONFIG } from '../../config/translate';
 
-const logoSvg = (
-  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="32" height="32" rx="16" fill="#EEE" />
-    <text x="16" y="22" textAnchor="middle" fontSize="18" fill="#353535" fontFamily="Kaushan Script, cursive">🍰</text>
-  </svg>
+const logoImg = (
+  <img 
+    src="/icons/icon48.png" 
+    alt="PromptCake Logo" 
+    width="40" 
+    height="40"
+    style={{ borderRadius: '50%' }}
+  />
 );
 
 const settingsSvg = (
@@ -20,6 +24,12 @@ interface SavedInstruction {
   createdAt: Date;
 }
 
+interface TranslationResult {
+  original: string;
+  translated: string;
+  detectedLanguage?: string;
+}
+
 interface MaterialCardProps {
   label: string;
   value: string;
@@ -27,17 +37,61 @@ interface MaterialCardProps {
   onRemove: () => void;
 }
 
-const MaterialCard: React.FC<MaterialCardProps> = ({ label, value, onChange, onRemove }) => {
+const MaterialCard: React.FC<MaterialCardProps & { onLabelChange: (val: string) => void; onTranslate: () => void; isTranslating?: boolean; }> = ({ label, value, onChange, onRemove, onLabelChange, onTranslate, isTranslating }) => {
   const [hover, setHover] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [labelInput, setLabelInput] = useState(label);
+
+  useEffect(() => {
+    setLabelInput(label);
+  }, [label]);
+
+  const handleLabelSave = () => {
+    if (labelInput.trim() && labelInput !== label) {
+      onLabelChange(labelInput.trim());
+    }
+    setEditing(false);
+  };
+
   return (
     <div className="popup-reference-card">
       <div className="popup-reference-header">
-        <span className="popup-reference-label">{label}</span>
+        {editing ? (
+          <input
+            className="popup-reference-label-input"
+            value={labelInput}
+            autoFocus
+            onChange={e => setLabelInput(e.target.value)}
+            onBlur={handleLabelSave}
+            onKeyDown={e => { if (e.key === 'Enter') handleLabelSave(); }}
+            style={{ marginRight: 8, width: 100 }}
+          />
+        ) : (
+          <span className="popup-reference-label">{label}</span>
+        )}
+        <button
+          className="popup-btn-edit"
+          title="Edit label"
+          onClick={() => setEditing(true)}
+          style={{ marginLeft: 4 }}
+        >
+          <svg width="14" height="14" fill="none" stroke="#888" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19.5 3 21l1.5-4L16.5 3.5z"/></svg>
+        </button>
+        <button
+          className="popup-btn-translate"
+          title="Translate"
+          onClick={onTranslate}
+          disabled={isTranslating}
+          style={{ marginLeft: 4 }}
+        >
+          <svg width="14" height="14" fill="none" stroke="#418fb7" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 17v1a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-1"/><path d="M7 11l5-5 5 5"/><path d="M12 4v12"/></svg>
+        </button>
         <button
           className={hover ? 'popup-btn-remove hovered' : 'popup-btn-remove'}
           onMouseOver={() => setHover(true)}
           onMouseOut={() => setHover(false)}
           onClick={onRemove}
+          style={{ marginLeft: 4 }}
         >
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 12 13"><path d="M3.625 1.125H3.5C3.56875 1.125 3.625 1.06875 3.625 1V1.125H8.375V1C8.375 1.06875 8.43125 1.125 8.5 1.125H8.375V2.25H9.5V1C9.5 0.448438 9.05156 0 8.5 0H3.5C2.94844 0 2.5 0.448438 2.5 1V2.25H3.625V1.125ZM11.5 2.25H0.5C0.223438 2.25 0 2.47344 0 2.75V3.25C0 3.31875 0.05625 3.375 0.125 3.375H1.06875L1.45469 11.5469C1.47969 12.0797 1.92031 12.5 2.45313 12.5H9.54688C10.0813 12.5 10.5203 12.0813 10.5453 11.5469L10.9313 3.375H11.875C11.9438 3.375 12 3.31875 12 3.25V2.75C12 2.47344 11.7766 2.25 11.5 2.25ZM9.42656 11.375H2.57344L2.19531 3.375H9.80469L9.42656 11.375Z" /></svg>
         </button>
@@ -56,12 +110,169 @@ const Popup: React.FC = () => {
   const [instruction, setInstruction] = useState('');
   const [savedInstructions, setSavedInstructions] = useState<SavedInstruction[]>([]);
   const [showSavedInstructions, setShowSavedInstructions] = useState(false);
-  const [references, setReferences] = useState([
-    { id: '1', label: 'Materials 1', value: '' },
-    { id: '2', label: 'Materials 2', value: '' },
-  ]);
+  const [references, setReferences] = useState<any[]>([]);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saved'>('idle');
   const [addHover, setAddHover] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [targetLanguage, setTargetLanguage] = useState('en');
+
+  // 语言选项 - 现在使用配置文件中的语言代码
+  const languageOptions = [
+    { code: 'en', name: 'EN' },
+    { code: 'zh', name: '中文' },
+    { code: 'ja', name: '日本語' },
+    { code: 'ko', name: '한국어' },
+    { code: 'es', name: 'ES' },
+    { code: 'fr', name: 'FR' },
+    { code: 'de', name: 'DE' },
+    { code: 'ru', name: 'RU' },
+    { code: 'it', name: 'IT' },
+    { code: 'pt', name: 'PT' },
+  ];
+
+  // Google Translate API调用（带重试逻辑）
+  const translateText = async (text: string, targetLang: string = 'en'): Promise<TranslationResult> => {
+    if (!TRANSLATE_CONFIG.GOOGLE_TRANSLATE_API_KEY) {
+      alert('Please configure Google Translate API Key in src/config/translate.ts');
+      throw new Error('Google Translate API Key not configured');
+    }
+
+    const detectedLang = detectLanguage(text);
+    
+    // 如果目标语言和检测到的语言相同，直接返回
+    if (detectedLang === targetLang) {
+      return {
+        original: text,
+        translated: text,
+        detectedLanguage: detectedLang
+      };
+    }
+
+    // 转换语言代码为Google Translate支持的格式
+    const googleTargetLang = TRANSLATE_CONFIG.LANGUAGE_CODES[targetLang as keyof typeof TRANSLATE_CONFIG.LANGUAGE_CODES] || targetLang;
+    const googleSourceLang = detectedLang !== 'auto' ? (TRANSLATE_CONFIG.LANGUAGE_CODES[detectedLang as keyof typeof TRANSLATE_CONFIG.LANGUAGE_CODES] || detectedLang) : undefined;
+
+    let lastError: Error | null = null;
+    
+    // 重试逻辑
+    for (let attempt = 0; attempt <= TRANSLATE_CONFIG.MAX_RETRIES; attempt++) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), TRANSLATE_CONFIG.TIMEOUT);
+
+        const response = await fetch(`${TRANSLATE_CONFIG.GOOGLE_TRANSLATE_API_URL}?key=${TRANSLATE_CONFIG.GOOGLE_TRANSLATE_API_KEY}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            q: text,
+            target: googleTargetLang,
+            source: googleSourceLang,
+            format: 'text'
+          }),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(`Translation API error: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.error) {
+          throw new Error(`Google Translate API error: ${data.error.message}`);
+        }
+
+        const translatedText = data.data.translations[0].translatedText;
+        const sourceLanguage = data.data.translations[0].detectedSourceLanguage || detectedLang;
+
+        return {
+          original: text,
+          translated: translatedText,
+          detectedLanguage: sourceLanguage
+        };
+
+      } catch (error) {
+        lastError = error as Error;
+        console.warn(`Translation attempt ${attempt + 1} failed:`, error);
+        
+        // 如果不是最后一次重试，等待一段时间后重试
+        if (attempt < TRANSLATE_CONFIG.MAX_RETRIES) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+        }
+      }
+    }
+
+    // 所有重试都失败，使用fallback处理
+    console.error('All translation attempts failed:', lastError);
+    
+    const fallbackTranslations: { [key: string]: { [key: string]: string } } = {
+      'en': {
+        '写一封求职信': 'Write a cover letter',
+        '我需要帮助': 'I need help',
+        '职位描述': 'Job description',
+        '简历': 'Resume',
+        '个人简历': 'Personal resume',
+        '工作经验': 'Work experience',
+        '技能': 'Skills',
+        '教育背景': 'Educational background'
+      },
+      'zh': {
+        'Write a cover letter': '写一封求职信',
+        'I need help': '我需要帮助',
+        'Job description': '职位描述',
+        'Resume': '简历',
+        'Personal resume': '个人简历',
+        'Work experience': '工作经验',
+        'Skills': '技能',
+        'Educational background': '教育背景'
+      }
+    };
+
+    // 尝试使用fallback翻译
+    let translated = text;
+    const translations = fallbackTranslations[targetLang];
+    if (translations) {
+      for (const [source, target] of Object.entries(translations)) {
+        if (text.includes(source)) {
+          translated = translated.replace(new RegExp(source, 'g'), target);
+        }
+      }
+    }
+
+    // 如果没有匹配到，显示错误信息
+    if (translated === text && detectedLang !== targetLang) {
+      const langPrefix = languageOptions.find(l => l.code === targetLang)?.name || targetLang.toUpperCase();
+      translated = `[Translation failed - ${langPrefix}] ${text}`;
+    }
+
+    return {
+      original: text,
+      translated: translated,
+      detectedLanguage: detectedLang
+    };
+  };
+
+  // 语言检测函数
+  const detectLanguage = (text: string): string => {
+    // 简单的语言检测逻辑
+    const chineseRegex = /[\u4e00-\u9fff]/;
+    const japaneseRegex = /[\u3040-\u309f\u30a0-\u30ff]/;
+    const koreanRegex = /[\uac00-\ud7af]/;
+    
+    if (chineseRegex.test(text)) return 'zh';
+    if (japaneseRegex.test(text)) return 'ja';
+    if (koreanRegex.test(text)) return 'ko';
+    
+    // 检测是否已经是英文
+    const englishRegex = /^[a-zA-Z\s\.,!?;:'"()-]+$/;
+    if (englishRegex.test(text.trim())) return 'en';
+    
+    return 'auto'; // 默认自动检测
+  };
 
   // 从 localStorage 加载保存的指令
   useEffect(() => {
@@ -84,6 +295,27 @@ const Popup: React.FC = () => {
     localStorage.setItem('promptcake-saved-instructions', JSON.stringify(instructions));
   };
 
+  // 编辑材料label
+  const handleLabelChange = (id: string, newLabel: string) => {
+    setReferences(refs => refs.map(r => r.id === id ? { ...r, label: newLabel } : r));
+  };
+
+  // 翻译单个材料
+  const handleTranslateMaterial = async (id: string) => {
+    const ref = references.find(r => r.id === id);
+    if (!ref || !ref.value.trim()) return;
+    setIsTranslating(true);
+    try {
+      const translation = await translateText(ref.value, targetLanguage);
+      // 直接替换材料内容
+      setReferences(refs => refs.map(r => r.id === id ? { ...r, value: translation.translated } : r));
+    } catch (e) {
+      alert('Translation failed.');
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
   // 添加材料
   const handleAddReference = () => {
     setReferences([
@@ -104,8 +336,8 @@ const Popup: React.FC = () => {
 
   // 复制全部
   const handleCopyAll = () => {
-    const all = instruction + '\n' + references.map(r => `${r.label}: ${r.value}`).join('\n');
-    navigator.clipboard.writeText(all);
+    let content = instruction + '\n\n' + references.map(r => r.value.trim() ? `${r.label}: ${r.value}` : '').filter(Boolean).join('\n');
+    navigator.clipboard.writeText(content);
     alert('Copied to clipboard!');
   };
 
@@ -143,9 +375,56 @@ const Popup: React.FC = () => {
     saveInstructionsToStorage(updatedInstructions);
   };
 
-  // 翻译（模拟）
-  const handleTranslate = () => {
-    alert('Translate to EN!');
+  // 翻译指令
+  const handleTranslateInstruction = async () => {
+    if (!instruction.trim()) return;
+    setIsTranslating(true);
+    try {
+      const translation = await translateText(instruction, targetLanguage);
+      setInstruction(translation.translated);
+    } catch (e) {
+      alert('Translation failed.');
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
+  // 翻译全部内容
+  const handleTranslateAll = async () => {
+    setIsTranslating(true);
+    
+    try {
+      const promises = [];
+      
+      // 翻译指令
+      if (instruction.trim()) {
+        promises.push(translateText(instruction, targetLanguage).then(result => {
+          setInstruction(result.translated);
+        }));
+      }
+      
+      // 翻译所有材料
+      references.forEach((ref, index) => {
+        if (ref.value.trim()) {
+          promises.push(translateText(ref.value, targetLanguage).then(result => {
+            setReferences(refs => refs.map(r => r.id === ref.id ? { ...r, value: result.translated } : r));
+          }));
+        }
+      });
+      
+      if (promises.length === 0) {
+        alert('No content to translate');
+        setIsTranslating(false);
+        return;
+      }
+      
+      await Promise.all(promises);
+    } catch (error) {
+      console.error('Translation failed:', error);
+      alert('Translation failed. Please try again.');
+    } finally {
+      setIsTranslating(false);
+    }
   };
 
   return (
@@ -153,7 +432,7 @@ const Popup: React.FC = () => {
       {/* 顶部 Logo + 名称 + 设置icon */}
       <div className="popup-header">
         <div className="popup-header-left">
-          <span className="popup-logo">{logoSvg}</span>
+          <span className="popup-logo">{logoImg}</span>
           <span className="popup-title">Promptcake</span>
         </div>
         <button className="popup-settings-btn" title="Settings">
@@ -237,13 +516,17 @@ const Popup: React.FC = () => {
         </div>
         <div className="popup-reference-list">
           {references.map((ref) => (
-            <MaterialCard
-              key={ref.id}
-              label={ref.label}
-              value={ref.value}
-              onChange={(val: string) => handleRefChange(ref.id, val)}
-              onRemove={() => handleRemoveReference(ref.id)}
-            />
+            <div key={ref.id}>
+              <MaterialCard
+                label={ref.label}
+                value={ref.value}
+                onChange={(val: string) => handleRefChange(ref.id, val)}
+                onRemove={() => handleRemoveReference(ref.id)}
+                onLabelChange={(val: string) => handleLabelChange(ref.id, val)}
+                onTranslate={() => handleTranslateMaterial(ref.id)}
+                isTranslating={isTranslating}
+              />
+            </div>
           ))}
           <button
             className={addHover ? 'popup-btn-add-material hovered' : 'popup-btn-add-material'}
@@ -258,11 +541,36 @@ const Popup: React.FC = () => {
 
       {/* 底部操作区 */}
       <div className="popup-actions-row">
-        <button className="popup-btn-translate" onClick={handleTranslate}>
-          Translate to EN
-        </button>
+        <div className="popup-translate-section">
+          <select 
+            value={targetLanguage} 
+            onChange={(e) => setTargetLanguage(e.target.value)}
+            className="popup-language-select"
+            disabled={isTranslating}
+          >
+            {languageOptions.map(lang => (
+              <option key={lang.code} value={lang.code}>{lang.name}</option>
+            ))}
+          </select>
+          <button 
+            className="popup-btn-translate" 
+            onClick={handleTranslateInstruction}
+            disabled={isTranslating || !instruction.trim()}
+            title="Translate instruction only"
+          >
+            {isTranslating ? 'Translating...' : 'Translate Instruction'}
+          </button>
+          <button 
+            className="popup-btn-translate-all" 
+            onClick={handleTranslateAll}
+            disabled={isTranslating}
+            title="Translate all content"
+          >
+            {isTranslating ? 'Translating...' : 'Translate All'}
+          </button>
+        </div>
         <button className="popup-btn-copyall" onClick={handleCopyAll}>
-          Copy all
+          Copy All
         </button>
       </div>
     </div>
