@@ -132,6 +132,10 @@ const Popup: React.FC = () => {
 
   // Google Translate API调用（带重试逻辑）
   const translateText = async (text: string, targetLang: string = 'en'): Promise<TranslationResult> => {
+    if (TRANSLATE_CONFIG.DEBUG_MODE) {
+      console.log('🔄 Translation request:', { text, targetLang });
+    }
+
     if (!TRANSLATE_CONFIG.GOOGLE_TRANSLATE_API_KEY) {
       alert('Please configure Google Translate API Key in src/config/translate.ts');
       throw new Error('Google Translate API Key not configured');
@@ -139,8 +143,15 @@ const Popup: React.FC = () => {
 
     const detectedLang = detectLanguage(text);
     
+    if (TRANSLATE_CONFIG.DEBUG_MODE) {
+      console.log('🔍 Detected language:', detectedLang);
+    }
+    
     // 如果目标语言和检测到的语言相同，直接返回
     if (detectedLang === targetLang) {
+      if (TRANSLATE_CONFIG.DEBUG_MODE) {
+        console.log('✅ Same language detected, returning original text');
+      }
       return {
         original: text,
         translated: text,
@@ -152,25 +163,39 @@ const Popup: React.FC = () => {
     const googleTargetLang = TRANSLATE_CONFIG.LANGUAGE_CODES[targetLang as keyof typeof TRANSLATE_CONFIG.LANGUAGE_CODES] || targetLang;
     const googleSourceLang = detectedLang !== 'auto' ? (TRANSLATE_CONFIG.LANGUAGE_CODES[detectedLang as keyof typeof TRANSLATE_CONFIG.LANGUAGE_CODES] || detectedLang) : undefined;
 
+    if (TRANSLATE_CONFIG.DEBUG_MODE) {
+      console.log('🌐 Language mapping:', { googleSourceLang, googleTargetLang });
+    }
+
     let lastError: Error | null = null;
     
     // 重试逻辑
     for (let attempt = 0; attempt <= TRANSLATE_CONFIG.MAX_RETRIES; attempt++) {
       try {
+        if (TRANSLATE_CONFIG.DEBUG_MODE) {
+          console.log(`🚀 Translation attempt ${attempt + 1}/${TRANSLATE_CONFIG.MAX_RETRIES + 1}`);
+        }
+
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), TRANSLATE_CONFIG.TIMEOUT);
+
+        const requestBody = {
+          q: text,
+          target: googleTargetLang,
+          source: googleSourceLang,
+          format: 'text'
+        };
+
+        if (TRANSLATE_CONFIG.DEBUG_MODE) {
+          console.log('📤 API Request body:', requestBody);
+        }
 
         const response = await fetch(`${TRANSLATE_CONFIG.GOOGLE_TRANSLATE_API_URL}?key=${TRANSLATE_CONFIG.GOOGLE_TRANSLATE_API_KEY}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            q: text,
-            target: googleTargetLang,
-            source: googleSourceLang,
-            format: 'text'
-          }),
+          body: JSON.stringify(requestBody),
           signal: controller.signal
         });
 
@@ -182,12 +207,24 @@ const Popup: React.FC = () => {
 
         const data = await response.json();
         
+        if (TRANSLATE_CONFIG.DEBUG_MODE) {
+          console.log('📥 API Response:', data);
+        }
+        
         if (data.error) {
           throw new Error(`Google Translate API error: ${data.error.message}`);
         }
 
         const translatedText = data.data.translations[0].translatedText;
         const sourceLanguage = data.data.translations[0].detectedSourceLanguage || detectedLang;
+
+        if (TRANSLATE_CONFIG.DEBUG_MODE) {
+          console.log('✅ Translation successful:', { 
+            original: text, 
+            translated: translatedText, 
+            detectedLanguage: sourceLanguage 
+          });
+        }
 
         return {
           original: text,
@@ -197,17 +234,28 @@ const Popup: React.FC = () => {
 
       } catch (error) {
         lastError = error as Error;
-        console.warn(`Translation attempt ${attempt + 1} failed:`, error);
+        
+        if (TRANSLATE_CONFIG.DEBUG_MODE) {
+          console.warn(`❌ Translation attempt ${attempt + 1} failed:`, error);
+        }
         
         // 如果不是最后一次重试，等待一段时间后重试
         if (attempt < TRANSLATE_CONFIG.MAX_RETRIES) {
-          await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+          const waitTime = 1000 * (attempt + 1);
+          if (TRANSLATE_CONFIG.DEBUG_MODE) {
+            console.log(`⏳ Waiting ${waitTime}ms before retry...`);
+          }
+          await new Promise(resolve => setTimeout(resolve, waitTime));
         }
       }
     }
 
     // 所有重试都失败，使用fallback处理
-    console.error('All translation attempts failed:', lastError);
+    console.error('🔥 All translation attempts failed:', lastError);
+    
+    if (TRANSLATE_CONFIG.DEBUG_MODE) {
+      console.log('🔄 Using fallback translation...');
+    }
     
     const fallbackTranslations: { [key: string]: { [key: string]: string } } = {
       'en': {
@@ -247,6 +295,10 @@ const Popup: React.FC = () => {
     if (translated === text && detectedLang !== targetLang) {
       const langPrefix = languageOptions.find(l => l.code === targetLang)?.name || targetLang.toUpperCase();
       translated = `[Translation failed - ${langPrefix}] ${text}`;
+    }
+
+    if (TRANSLATE_CONFIG.DEBUG_MODE) {
+      console.log('🔄 Fallback result:', { original: text, translated, detectedLanguage: detectedLang });
     }
 
     return {
